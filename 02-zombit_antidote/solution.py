@@ -3,9 +3,9 @@ from operator import itemgetter
 def answer(meetings):
     sorted_meetings = sorted(meetings, key=itemgetter(0,1))
     unique_meetings = remove_duplicates(sorted_meetings)
-    all_meeting_groups = non_overlapping_group([], unique_meetings)
+    all_meeting_groups = [non_overlapping_group([], unique_meetings)]
     for m in unique_meetings:
-        all_meeting_groups.extend(non_overlapping_group([], remove_from_list(m, unique_meetings)))
+        all_meeting_groups.append(non_overlapping_group([], remove_from_list(m, unique_meetings)))
     return max_length(all_meeting_groups)
 
 def remove_duplicates(lol):
@@ -14,11 +14,11 @@ def remove_duplicates(lol):
         return lol
     else:
         head, tail = lol[0], lol[1:]
-        out_lst.extend(head)
+        out_lst.append(head)
         prev = head
         for l in tail:
             if prev != l:
-                out_lst.extend(l)
+                out_lst.append(l)
             prev = l
         return out_lst
 
@@ -34,24 +34,25 @@ def non_overlapping_group(acc, lst):
             if overlaps(last_entry_found, head):
                 return non_overlapping_group(acc, tail)
             else:
-                return non_overlapping_group(acc.extend(head), tail)
+                acc.append(head)
+                return non_overlapping_group(acc, tail)
 
 # check if two meetings overlap
 # inputs are assumed to be ordered
 def overlaps(m1, m2):
-    return end(m1) <= start(m2)
+    def start(m):
+        return m[0]
+    def end(m):
+        return m[1]
 
-def start(m):
-    return m[0]
-def end(m):
-    return m[1]
+    return end(m1) > start(m2)
 
 # remove the specified element from given list and return the rest
 def remove_from_list(x, lst):
     out_lst = []
     for el in lst:
         if el != x:
-            out_lst.extend(el)
+            out_lst.append(el)
     return out_lst
 
 # find length of the largest list in the list of lists
